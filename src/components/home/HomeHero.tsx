@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
+import type { Variants } from 'motion/react';
 import { Heart, Play } from 'lucide-react';
 import type { ChannelWithSchedule } from '@/lib/types';
 import { LiveBadge, ProgressBar, QualityBadge, StatusBadge } from '@/components/ui/primitives';
@@ -9,12 +10,12 @@ import { formatTashkentTime } from '@/lib/epg';
 import { useFavorites } from '@/hooks/useLocalCollection';
 import { useToast } from '@/components/ui/Toast';
 
-const container = {
+const container: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
 };
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 14 },
   show: { opacity: 1, y: 0, transition: { duration: 0.34, ease: 'easeOut' } },
 };
@@ -27,11 +28,7 @@ export function HomeHero({ featured }: { featured: ChannelWithSchedule }) {
 
   const onFavorite = () => {
     const added = toggle(channel.slug);
-    push({
-      tone: 'success',
-      title: added ? 'Added to favorites' : 'Removed from favorites',
-      body: channel.name,
-    });
+    push({ tone: 'success', title: added ? 'Added to favorites' : 'Removed from favorites', body: channel.name });
   };
 
   return (
