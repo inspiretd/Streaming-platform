@@ -1,9 +1,3 @@
 import { describe, expect, it } from 'vitest';
-import { parseSafeM3u } from '@/lib/m3u';
-
-describe('parseSafeM3u', () => {
-  it('parses permitted https entries and rejects unsafe content', () => {
-    const input = '#EXTM3U\n#EXTINF:0 group-title="News" tvg-id="demo",Demo News\nhttps://demo.invalid/live.m3u8\n#EXTINF:0 group-title="Adult",Hidden\nhttps://demo.invalid/adult.m3u8\n#EXTINF:0 group-title="News",Insecure\nhttp://demo.invalid/live.m3u8';
-    expect(parseSafeM3u(input)).toEqual([{ name: 'Demo News', url: 'https://demo.invalid/live.m3u8', group: 'News', tvgId: 'demo', tvgLogo: undefined }]);
-  });
-});
+import { parseM3uPreview } from '@/lib/m3u';
+describe('M3U preview', () => { it('extracts metadata and rejects unsafe entries', () => { const preview = parseM3uPreview('#EXTM3U\n#EXTINF:0 group-title="O\'zbekistan",Demo HD +2\nhttps://authorized.example/live.m3u8\n#EXTINF:0 group-title="Взрослые",Hidden\nhttps://authorized.example/hidden.m3u8\n#EXTINF:0 group-title="News",Bad\nhttp://private.example/live.m3u8'); expect(preview.valid).toBe(1); expect(preview.rejected).toBe(1); expect(preview.invalid).toBe(1); expect(preview.entries[0]).toMatchObject({ quality: 'HD', country: 'UZ', timeshift: '2' }); }); });
