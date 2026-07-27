@@ -1,51 +1,176 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { motion, MotionConfig } from 'motion/react';
-import { ArrowRight, Bell, ChevronRight, Compass, Heart, Menu, Play, Settings2, Tv, X } from 'lucide-react';
-import { useState } from 'react';
-import type { Channel } from '@/lib/demo';
-import { ChannelCard } from './ChannelCard';
-import { StatusPanel } from './StatusPanel';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion } from 'motion/react';
+import { Bell, CalendarDays, Heart, Home, Search, Settings2, Tv, User } from 'lucide-react';
+import { mobileNav, primaryNav, siteConfig } from '@/config/site';
+import { useSearchOverlay } from '@/components/search/SearchProvider';
 
-const nav = [{ href: '/', label: 'Home' }, { href: '/live', label: 'Live TV' }, { href: '/guide', label: 'TV Guide' }, { href: '/search', label: 'Search' }] as const;
+const MOBILE_ICONS = [Home, Tv, CalendarDays, Heart, User];
 
-export function CinematicShell({ channels, active = 'home' }: { channels: Channel[]; active?: string }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const featured = channels[0];
-  const current = active === 'guide' ? 'Guide' : active === 'admin' ? 'Admin' : active === 'search' ? 'Search' : active === 'live' ? 'Live TV' : 'Home';
+function isActive(pathname: string, href: string): boolean {
+  if (href === '/') return pathname === '/';
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function TopNav() {
+  const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+  const { open } = useSearchOverlay();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <MotionConfig reducedMotion="user">
-      <main className="app-shell">
-        <header className="topbar">
-          <Link href="/" className="brand"><span className="brand-glyph">T</span><span>TOMOSHA</span></Link>
-          <nav className="desktop-nav">{nav.map((item) => <Link className={current === item.label ? 'active' : ''} href={item.href} key={item.href}>{item.label}</Link>)}</nav>
-          <div className="top-actions">
-            <button className="icon-button" aria-label="Notifications"><Bell size={18} /></button>
-            <Link href="/admin" className="admin-link">Admin <Settings2 size={15} /></Link>
-            <button className="menu-button" aria-label="Open menu" onClick={() => setMenuOpen((value) => !value)}>{menuOpen ? <X size={20} /> : <Menu size={20} />}</button>
+    <header className="topbar" data-scrolled={scrolled}>
+      <div className="container topbar-inner">
+        <Link href="/" className="brand" aria-label={`${siteConfig.name} home`}>
+          <span className="brand-mark" aria-hidden="true">
+            T
+          </span>
+          <span>{siteConfig.name}</span>
+        </Link>
+
+        <nav className="desktop-nav" aria-label="Primary">
+          {primaryNav.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link key={item.href} href={item.href} className="nav-link" data-active={active} aria-current={active ? 'page' : undefined}>
+                {active ? (
+                  <motion.span layoutId="nav-indicator" className="nav-indicator" transition={{ type: 'spring', stiffness: 460, damping: 38 }} />
+                ) : null}
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="top-actions">
+          <button type="button" className="search-trigger" onClick={open}>
+            <Search size={16} aria-hidden="true" />
+            <span>Search channels</span>
+            <span className="kbd mono">Ctrl K</span>
+          </button>
+          <button type="button" className="icon-btn" onClick={open} aria-label="Open search" style={{ display: 'grid' }}>
+            <Search size={17} aria-hidden="true" />
+          </button>
+          <Link href="/profile" className="icon-btn" aria-label="Notifications and profile">
+            <Bell size={17} aria-hidden="true" />
+          </Link>
+          <Link href="/admin" className="btn btn-ghost btn-sm" aria-label="Admin console">
+            <Settings2 size={15} aria-hidden="true" />
+            <span>Admin</span>
+          </Link>
+          <Link href="/live" className="btn btn-primary btn-sm">
+            Watch now
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function MobileTabBar() {
+  const pathname = usePathname();
+  return (
+    <nav className="mobile-tabbar" aria-label="Mobile">
+      {mobileNav.map((item, index) => {
+        const Icon = MOBILE_ICONS[index] ?? Home;
+        const active = isActive(pathname, item.href);
+        return (
+          <Link key={item.href} href={item.href} className="tab-item" data-active={active} aria-current={active ? 'page' : undefined}>
+            {active ? <motion.span layoutId="tab-indicator" className="tab-indicator" transition={{ type: 'spring', stiffness: 480, damping: 40 }} /> : null}
+            <Icon size={19} aria-hidden="true" />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function PageTransition({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={pathname}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.24, ease: 'easeOut' }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+const FOOTER_LINKS: { title: string; links: { href: string; label: string }[] }[] = [
+  {
+    title: 'Platform',
+    links: [
+      { href: '/live', label: 'Live TV' },
+      { href: '/guide', label: 'TV guide' },
+      { href: '/watch', label: 'Movies' },
+      { href: '/favorites', label: 'Favorites' },
+    ],
+  },
+  {
+    title: 'Rights holders',
+    links: [
+      { href: '/privacy', label: 'Content partnerships' },
+      { href: '/privacy', label: 'Copyright request' },
+      { href: '/privacy', label: 'Provider onboarding' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { href: '/privacy', label: 'Privacy' },
+      { href: '/privacy', label: 'Terms' },
+      { href: '/privacy', label: 'Support' },
+    ],
+  },
+];
+
+export function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <div className="container">
+        <div className="footer-grid">
+          <div className="footer-col">
+            <span className="brand">
+              <span className="brand-mark" aria-hidden="true">
+                T
+              </span>
+              <span>{siteConfig.name}</span>
+            </span>
+            <p className="feature-text">{siteConfig.tagline}</p>
           </div>
-        </header>
-        {menuOpen && <div className="mobile-menu">{nav.map((item) => <Link href={item.href} key={item.href} onClick={() => setMenuOpen(false)}>{item.label}<ChevronRight size={16} /></Link>)}</div>}
-        <section className="hero">
-          <div className="hero-grid">
-            <div className="hero-kicker"><span className="live-pulse" /> On air now <span className="mono">18:12 TST</span></div>
-            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
-              <p className="eyebrow">TOMOSHA PREMIERE / {featured.category.toUpperCase()}</p>
-              <h1>Stories that<br /><em>stay with you.</em></h1>
-              <p className="hero-copy">A sharper way to find the broadcasts, voices, and moments worth staying for.</p>
-              <div className="hero-actions"><Link href={`/live/${featured.id}`} className="primary-button"><Play size={16} fill="currentColor" /> Watch now</Link><button className={`secondary-button ${saved ? 'is-saved' : ''}`} onClick={() => setSaved((value) => !value)}><Heart size={16} fill={saved ? 'currentColor' : 'none'} /> {saved ? 'Saved' : 'Add to favorites'}</button></div>
-            </motion.div>
-            <div className="hero-meta"><span><b>{featured.name}</b> / {featured.program}</span><span className="mono">Next {featured.next}</span></div>
-          </div>
-          <div className="hero-orbit"><div className="orbit-card orbit-back" /><div className="orbit-card orbit-main"><span className="orbit-logo">{featured.shortName}</span><span className="orbit-caption">Toshkent<br /><small>live broadcast</small></span></div><div className="orbit-stamp">SINCE<br /><b>2026</b></div></div>
-        </section>
-        <section className="content-section"><div className="section-head"><div><p className="eyebrow">Curated for tonight</p><h2>On air now <span>/{channels.filter((channel) => channel.live).length} channels</span></h2></div><Link className="text-link" href="/live">Open live catalog <ArrowRight size={16} /></Link></div><div className="channel-grid">{channels.map((channel, index) => <motion.div key={channel.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05, duration: 0.25 }}><ChannelCard channel={channel} /></motion.div>)}</div></section>
-        <section className="split-section"><div className="guide-card"><div className="section-head compact"><div><p className="eyebrow">Tonight / Monday</p><h2>Signal guide</h2></div><Link className="round-link" href="/guide"><Compass size={18} /></Link></div><div className="guide-row active-row"><span className="mono">18:00</span><div><b>Shahar ritmi</b><p>Toshkent <span>•</span> General</p></div><span className="on-now">ON NOW</span></div><div className="guide-row"><span className="mono">18:30</span><div><b>Yangiliklar</b><p>Toshkent <span>•</span> News</p></div><span className="mono muted">30 min</span></div><div className="guide-row"><span className="mono">19:00</span><div><b>Ochiq kitob</b><p>Madaniyat va Ma’rifat</p></div><span className="mono muted">45 min</span></div></div><div className="signal-note"><div className="note-icon"><Tv size={21} /></div><p className="eyebrow">The TOMOSHA promise</p><h2>Less hunting.<br /><em>More watching.</em></h2><p>Favorites, a clean guide, and a calm interface built for the way people actually watch.</p><Link href="/favorites" className="text-link">Your saved channels <ArrowRight size={16} /></Link></div></section>
-        <section className="state-section"><StatusPanel kind="success" title="Demo catalog ready" detail="Only safe fixtures are active. Authorized providers can be connected from Admin." /><StatusPanel kind="empty" title="No saved channels yet" detail="Save a channel to see it here." /></section>
-        <footer className="footer"><div><span className="brand"><span className="brand-glyph">T</span><span>TOMOSHA</span></span><p>Live broadcast. Favorite channels. One place.</p></div><div className="footer-links"><Link href="/guide">Guide</Link><Link href="/admin">Rights & providers</Link><Link href="/privacy">Privacy</Link></div><span className="mono">UZ / RU / EN</span></footer>
-      </main>
-    </MotionConfig>
+          {FOOTER_LINKS.map((group) => (
+            <div key={group.title} className="footer-col">
+              <span className="footer-title">{group.title}</span>
+              {group.links.map((link) => (
+                <Link key={`${group.title}-${link.label}`} href={link.href} className="footer-link">
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="footer-bottom">
+          <span>Only licensed and rights holder approved streams are published.</span>
+          <span className="mono">TOMOSHA MVP</span>
+        </div>
+      </div>
+    </footer>
   );
 }
