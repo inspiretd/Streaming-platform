@@ -1,16 +1,71 @@
 'use client';
-import { useMemo, useState } from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
-import type { Channel } from '@/lib/demo';
-import { filterChannels } from '@/lib/channel';
-import { ChannelCard } from './ChannelCard';
-import { StatusPanel } from './StatusPanel';
 
-export function LiveCatalog({ channels }: { channels: Channel[] }) {
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('');
-  const [country, setCountry] = useState('');
-  const [online, setOnline] = useState(false);
-  const results = useMemo(() => filterChannels(channels, { query, category, country, online: online ? true : undefined }), [channels, query, category, country, online]);
-  return <section className="catalog-page"><div className="catalog-toolbar"><div><p className="eyebrow">Live television</p><h1>Find your signal.</h1><p className="hero-copy">Browse safe demo fixtures by country, category, and live state.</p></div><div className="catalog-controls"><label className="search-field"><Search size={16} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search channels" aria-label="Search channels" /></label><select value={country} onChange={(event) => setCountry(event.target.value)} aria-label="Country"><option value="">All countries</option><option value="UZ">Uzbekistan</option><option value="INT">International</option></select><select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Category"><option value="">All categories</option>{Array.from(new Set(channels.map((channel) => channel.category))).map((item) => <option key={item} value={item}>{item}</option>)}</select><button className={`filter-toggle ${online ? 'selected' : ''}`} onClick={() => setOnline((value) => !value)}><SlidersHorizontal size={15} /> Online only</button></div></div>{results.length ? <div className="channel-grid">{results.map((channel) => <ChannelCard key={channel.id} channel={channel} />)}</div> : <StatusPanel kind="empty" title="No channels match" detail="Try a broader search or clear one of the filters." />}</section>;
+import { useRef } from 'react';
+import Link from 'next/link';
+import { motion } from 'motion/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import type { ChannelWithSchedule } from '@/lib/types';
+import { ChannelCard } from '@/components/ChannelCard';
+import { EmptyState } from '@/components/StatusPanel';
+
+export function ChannelRail({
+  title,
+  subtitle,
+  items,
+  href,
+}: {
+  title: string;
+  subtitle?: string;
+  items: ChannelWithSchedule[];
+  href?: string;
+}) {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollBy = (direction: 1 | -1) => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollBy({ left: direction * Math.max(280, track.clientWidth * 0.8), behavior: 'smooth' });
+  };
+
+  return (
+    <motion.section
+      className="section rail"
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.32, ease: 'easeOut' }}
+    >
+      <div className="section-head">
+        <div>
+          <h2 className="section-title">{title}</h2>
+          {subtitle ? <p className="section-sub">{subtitle}</p> : null}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {href ? (
+            <Link href={href} className="section-link">
+              View all
+            </Link>
+          ) : null}
+          <div className="rail-nav">
+            <button type="button" className="icon-btn" onClick={() => scrollBy(-1)} aria-label={`Scroll ${title} left`}>
+              <ChevronLeft size={17} aria-hidden="true" />
+            </button>
+            <button type="button" className="icon-btn" onClick={() => scrollBy(1)} aria-label={`Scroll ${title} right`}>
+              <ChevronRight size={17} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {items.length === 0 ? (
+        <EmptyState title="No channels here yet" description="This rail will fill up as soon as licensed channels are published." />
+      ) : (
+        <div className="rail-track" ref={trackRef}>
+          {items.map((item) => (
+            <ChannelCard key={item.channel.id} item={item} />
+          ))}
+        </div>
+      )}
+    </motion.section>
+  );
 }
