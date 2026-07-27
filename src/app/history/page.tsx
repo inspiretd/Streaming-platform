@@ -1,3 +1,26 @@
-import { AppChrome } from '@/components/AppChrome';
-import { StatusPanel } from '@/components/StatusPanel';
-export default function HistoryPage() { return <AppChrome><section className="simple-page"><p className="eyebrow">Your viewing trail</p><h1>History</h1><StatusPanel kind="empty" title="Nothing watched yet" detail="Start with a live channel and your recent viewing will appear here." /></section></AppChrome>; }
+import type { Metadata } from 'next';
+import { HistoryView } from '@/components/user/UserViews';
+import { getChannels, getScheduled } from '@/server/catalog';
+
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'Watch history',
+  description: 'Continue watching where you left off across the TOMOSHA catalog.',
+  alternates: { canonical: '/history' },
+};
+
+export default function HistoryPage() {
+  const items = getScheduled(getChannels().filter((channel) => channel.state === 'published'));
+  return (
+    <div className="container">
+      <header className="page-head">
+        <h1 className="page-title">Watch history</h1>
+        <p className="page-sub">Recently opened channels and continue watching, stored locally for privacy.</p>
+      </header>
+      <div style={{ marginTop: 22 }}>
+        <HistoryView items={items} />
+      </div>
+    </div>
+  );
+}
