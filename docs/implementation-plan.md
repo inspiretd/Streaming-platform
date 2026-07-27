@@ -14,16 +14,32 @@ Audit date: 2026-07-27
 
 ## Delivery phases
 
-### Phase 1: foundation and cinematic shell
+### Phase 1: foundation and cinematic shell (COMPLETED)
 
-- [ ] Create a single Next.js App Router application with strict TypeScript
-- [ ] Add Tailwind, Motion for React, Lucide, Vitest, Playwright, and accessibility test support
-- [ ] Establish TOMOSHA design tokens, typography, responsive grid, focus states, and reduced-motion behavior
-- [ ] Build the original home, live catalog, guide, search, watch scaffold, auth, profile, favorites, history, and admin shells
-- [ ] Add loading, empty, error, and success states to every route
-- [ ] Add safe demo fixtures only, with no provider credentials or private stream data
-- [ ] Add README, `.env.example`, architecture, content-rights, provider-integration, and deployment docs
-- [ ] Run lint, TypeScript typecheck, unit tests, and production build; stop on failure
+Approved CI run: [#15 / 30272183080](https://github.com/inspiretd/Streaming-platform/actions/runs/30272183080)
+Commit SHA: `2669ee7989e719e1141fed800683e9733e981e9d`
+pnpm version: 9.15.0
+Lockfile: valid, committed, frozen-lockfile verified
+
+- [x] Create a single Next.js App Router application with strict TypeScript
+- [x] Add Tailwind, Motion for React, Lucide, Vitest, Playwright, and accessibility test support
+- [x] Establish TOMOSHA design tokens, typography, responsive grid, focus states, and reduced-motion behavior
+- [x] Build the original home, live catalog, guide, search, watch scaffold, auth, profile, favorites, history, and admin shells
+- [x] Add loading, empty, error, and success states to every route
+- [x] Add safe demo fixtures only, with no provider credentials or private stream data
+- [x] Add README, `.env.example`, architecture, content-rights, provider-integration, and deployment docs
+- [x] Run lint, TypeScript typecheck, unit tests, and production build; stop on failure
+
+Gate results:
+- lint: pass (0 errors, 0 warnings)
+- typecheck: pass
+- test: pass (1 file, 1 test)
+- build: pass
+
+Security:
+- Credential-like path in historical playlist: compromised, rotation required before production use
+- History cleanup: documented in docs/security-incident.md, not executed
+- `.gitignore`: *.m3u, *.m3u8, /private-playlists/, /imports/private/ confirmed
 
 ### Phase 2: live catalog and playback
 
@@ -59,13 +75,13 @@ Audit date: 2026-07-27
 
 ## Validation checklist
 
-- [ ] `pnpm lint`
-- [ ] `pnpm typecheck`
-- [ ] `pnpm test`
-- [ ] `pnpm build`
-- [ ] No `any` types unless explicitly justified in a comment
-- [ ] No real provider tokens, cookies, account IDs, or M3U credentials
-- [ ] No adult or unknown streams in demo content
-- [ ] No provider authentication forgery, DRM bypass, or segment proxying
-- [ ] Every page has loading, empty, error, and success affordances
-- [ ] UI remains original and does not reproduce an existing streaming service
+- [x] `pnpm lint`
+- [x] `pnpm typecheck`
+- [x] `pnpm test`
+- [x] `pnpm build`
+- [x] No `any` types unless explicitly justified in a comment
+- [x] No real provider tokens, cookies, account IDs, or M3U credentials
+- [x] No adult or unknown streams in demo content
+- [x] No provider authentication forgery, DRM bypass, or segment proxying
+- [x] Every page has loading, empty, error, and success affordances
+- [x] UI remains original and does not reproduce an existing streaming service
