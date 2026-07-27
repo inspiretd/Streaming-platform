@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, MotionConfig } from 'motion/react';
-import { ArrowRight, Bell, ChevronRight, Compass, Heart, Menu, Play, Search, Settings2, Tv, X } from 'lucide-react';
+import { ArrowRight, Bell, ChevronRight, Compass, Heart, Menu, Play, Settings2, Tv, X } from 'lucide-react';
 import { useState } from 'react';
 import type { Channel } from '@/lib/demo';
 import { ChannelCard } from './ChannelCard';
