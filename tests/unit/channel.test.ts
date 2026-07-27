@@ -21,12 +21,13 @@ describe('normalization', () => {
   });
 
   it('transliterates cyrillic to latin', () => {
-    expect(toLatin('\u0423\u0437\u0431\u0435\u043a')).toBe('Uzbek'.toLowerCase().replace('u', 'u'));
+    expect(toLatin('\u0443\u0437\u0431\u0435\u043a')).toBe('uzbek');
+    expect(toLatin('\u0441\u043f\u043e\u0440\u0442')).toBe('sport');
   });
 
   it('produces tolerant search values', () => {
     expect(normalizeSearchValue('O\u02bbzbekiston 24 HD')).toBe('ozbekiston 24 hd');
-    expect(normalizeSearchValue('\u0443\u0437\u0431\u0435\u043a')).toBe('uzbek');
+    expect(normalizeSearchValue('\u0423\u0437\u0431\u0435\u043a')).toBe('uzbek');
   });
 
   it('slugifies uzbek names', () => {

@@ -14,7 +14,9 @@ const PLAYLIST = [
   '#EXTINF:-1 group-title="XXX",Another Blocked',
   'https://demo.example.com/blocked2/index.m3u8',
   '#EXTINF:-1 group-title="Local",Private Host',
-  'http://192.168.1.4/index.m3u8',
+  'https://192.168.1.4/index.m3u8',
+  '#EXTINF:-1 group-title="Local",Insecure Source',
+  'http://cdn.example.com/index.m3u8',
   '#EXTINF:-1 group-title="Local",Broken Url',
   'not-a-url',
 ].join('\n');
@@ -43,11 +45,12 @@ describe('content safety', () => {
 });
 
 describe('playlist parsing', () => {
-  it('rejects adult, private and invalid entries', () => {
+  it('rejects adult, private, insecure and invalid entries', () => {
     const result = parseM3u(PLAYLIST);
     const reasons = result.rejected.map((entry) => entry.reason);
     expect(reasons).toContain('adult');
     expect(reasons).toContain('private_host');
+    expect(reasons).toContain('insecure_scheme');
     expect(reasons).toContain('invalid_url');
     expect(result.entries.every((entry) => entry.url.startsWith('https://'))).toBe(true);
   });
