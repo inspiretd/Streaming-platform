@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function PrivacyPage() { return <main className="app-shell"><header className="topbar"><Link href="/" className="brand"><span className="brand-glyph">T</span><span>TOMOSHA</span></Link></header><section className="simple-page"><p className="eyebrow">Trust by design</p><h1>Privacy</h1><p className="hero-copy">TOMOSHA does not store provider cookies, access tokens, or account identifiers in the frontend. Demo playback uses fixtures only.</p></section></main>; }
