@@ -8,7 +8,7 @@ import type { Channel } from '@/lib/demo';
 import { ChannelCard } from './ChannelCard';
 import { StatusPanel } from './StatusPanel';
 
-const nav = [{ href: '/', label: 'Home' }, { href: '/live', label: 'Live TV' }, { href: '/guide', label: 'TV Guide' }, { href: '/search', label: 'Search' }];
+const nav = [{ href: '/', label: 'Home' }, { href: '/live', label: 'Live TV' }, { href: '/guide', label: 'TV Guide' }, { href: '/search', label: 'Search' }] as const;
 
 export function CinematicShell({ channels, active = 'home' }: { channels: Channel[]; active?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
