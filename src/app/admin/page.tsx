@@ -1,6 +1,4 @@
-import { CinematicShell } from '@/components/CinematicShell';
-import { demoChannels } from '@/lib/demo';
-
-export default function AdminPage() {
-  return <CinematicShell channels={demoChannels} active="admin" />;
-}
+import Link from 'next/link';
+import { ArrowLeft, Database, LockKeyhole, Radio } from 'lucide-react';
+import { AdminImport } from '@/components/AdminImport';
+export default function AdminPage() { return <main className="app-shell"><header className="topbar"><Link href="/" className="brand"><span className="brand-glyph">T</span><span>TOMOSHA</span></Link><Link href="/" className="text-link"><ArrowLeft size={16} /> Back to product</Link></header><section className="simple-page admin-page"><p className="eyebrow">Operations / protected workspace</p><h1>Keep the signal<br /><em>legitimate.</em></h1><p className="hero-copy">Connect rights-confirmed providers, preview imports, and keep every publish decision auditable.</p><div className="admin-metrics"><div><Radio size={17} /><strong>Demo mode</strong><span>No provider connected</span></div><div><Database size={17} /><strong>0 published</strong><span>Rights review required</span></div><div><LockKeyhole size={17} /><strong>Secrets isolated</strong><span>Never returned to UI</span></div></div><AdminImport /></section></main>; }
