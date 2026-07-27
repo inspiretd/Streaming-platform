@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { LiveCatalog } from '@/components/LiveCatalog';
+import { AppChrome } from '@/components/AppChrome';
+import { ChannelCatalog } from '@/components/ChannelCatalog';
 import { demoChannels } from '@/lib/demo';
-export default function LivePage() { return <main className="app-shell"><header className="topbar"><Link href="/" className="brand"><span className="brand-glyph">T</span><span>TOMOSHA</span></Link><Link href="/" className="text-link"><ArrowLeft size={16} /> Home</Link></header><LiveCatalog channels={demoChannels} /></main>; }
+export default function LivePage() { return <AppChrome active="live-tv"><section className="catalog-page"><ChannelCatalog channels={demoChannels} /></section></AppChrome>; }

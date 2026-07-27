@@ -1,0 +1,2 @@
+import { AppChrome } from '@/components/AppChrome';
+export default function ProfilePage() { return <AppChrome active="profile"><section className="simple-page profile-page"><p className="eyebrow">Your TOMOSHA</p><h1>Make it <em>yours.</em></h1><div className="settings-list"><div><strong>Guest profile</strong><span>Sign in to sync favorites and history</span></div><div><strong>Language</strong><span>O‘zbek / Русский / English</span></div><div><strong>Playback</strong><span>Autoplay off, reduced data off</span></div></div></section></AppChrome>; }
