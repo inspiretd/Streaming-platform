@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from 'next';
-import { JetBrains_Mono, Manrope } from 'next/font/google';
+import type { CSSProperties } from 'react';
 import './globals.css';
 import { AppChrome } from '@/components/AppChrome';
 import { siteConfig } from '@/config/site';
 
-const sans = Manrope({ subsets: ['latin', 'cyrillic'], display: 'swap', variable: '--font-sans' });
-const mono = JetBrains_Mono({ subsets: ['latin'], display: 'swap', variable: '--font-mono' });
+/**
+ * Fonts are resolved without a build time network fetch so the production build
+ * stays hermetic. Manrope and JetBrains Mono are used when available locally or
+ * self hosted, otherwise the tuned system stack keeps the same metrics.
+ */
+const fontVariables = {
+  '--font-sans': "'Manrope', 'Geist Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial",
+  '--font-mono': "'JetBrains Mono', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+} as CSSProperties;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -40,7 +47,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="uz" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="uz" style={fontVariables}>
       <body>
         <AppChrome>{children}</AppChrome>
       </body>
